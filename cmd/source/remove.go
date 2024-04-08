@@ -8,7 +8,7 @@ import (
 
 var removeCmd = &cobra.Command{
 	Use:   "remove",
-	Short: "List all available source folders",
+	Short: "Remove selected source",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println(cmd)
 	},

@@ -6,13 +6,14 @@ import (
 	"path/filepath"
 	"slices"
 
+	"github.com/sebcej/githis/aggregator"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var addCmd = &cobra.Command{
 	Use:   "add",
-	Short: "List all available source folders",
+	Short: "Add source folder. A source folder is considered the parent folder of all your projects",
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		addedPath, err := filepath.Abs(args[1])
@@ -22,13 +23,13 @@ var addCmd = &cobra.Command{
 		_, err = os.Stat(addedPath)
 		cobra.CheckErr(err)
 
-		newSource := Source{args[0], addedPath}
+		newSource := aggregator.Source{args[0], addedPath}
 
-		sources := []Source{}
+		sources := []aggregator.Source{}
 
 		viper.UnmarshalKey("sources", &sources)
 
-		if slices.IndexFunc[[]Source](sources, func(s Source) bool { return s.Name == newSource.Name }) != -1 {
+		if slices.IndexFunc[[]aggregator.Source](sources, func(s aggregator.Source) bool { return s.Name == newSource.Name }) != -1 {
 			cobra.CheckErr(errors.New("name already used"))
 			return
 		}
