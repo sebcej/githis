@@ -3,6 +3,8 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/fatih/color"
+	"github.com/rodaine/table"
 	"github.com/sebcej/githis/aggregator"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -25,8 +27,25 @@ var logsCmd = &cobra.Command{
 		filters := aggregator.Filters{}
 		logs := aggregator.GetLogs(sources, filters, args)
 
-		fmt.Println("Logs", logs)
+		fmt.Println("Total logs: ", len(logs))
+		fmt.Println("")
+
+		makeTable(logs)
+
+		//fmt.Println("Logs", logs)
 	},
+}
+
+func makeTable(logs []aggregator.Log) {
+	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
+	tbl := table.New("Hash", "Author", "Timestamp", "Message")
+	tbl.WithHeaderFormatter(headerFmt)
+
+	for _, log := range logs {
+		tbl.AddRow(log.Hash, log.Author.Name, log.Date, log.Message)
+	}
+
+	tbl.Print()
 }
 
 func init() {

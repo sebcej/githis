@@ -16,5 +16,5 @@ type Log struct {
 	Date    string       `json:"date"`
 	Hash    string       `json:"hash"`
 	Author  CommitAuthor `json:"author"`
-	Message string       `json:"message"`
+	Message string       `json:"subject"`
 }

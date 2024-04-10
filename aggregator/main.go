@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sort"
+	"time"
 )
 
 func GetLogs(sources []Source, filters Filters, extraArgs []string) (logs []Log) {
@@ -31,7 +33,12 @@ func GetLogs(sources []Source, filters Filters, extraArgs []string) (logs []Log)
 		}
 	}
 
-	fmt.Println("Available logs: ", len(logs))
+	sort.SliceStable(logs, func(i, j int) bool {
+		prevTime, _ := time.Parse("2006-01-02 15:04:05", logs[i].Date)
+		nextTime, _ := time.Parse("2006-01-02 15:04:05", logs[j].Date)
+
+		return prevTime.Before(nextTime)
+	})
 
 	return
 }
