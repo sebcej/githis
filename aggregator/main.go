@@ -57,7 +57,7 @@ func indexFolder(source Source, rc chan []Log, filters Filters, extraArgs []stri
 		_, err := os.Stat(path + "/.git")
 
 		if project.IsDir() && !os.IsNotExist(err) {
-			projectLogs := getFromGit(path, filters, extraArgs)
+			projectLogs := getFromGit(project.Name(), path, filters, extraArgs)
 			logs = append(logs, projectLogs...)
 		}
 	}
@@ -65,7 +65,7 @@ func indexFolder(source Source, rc chan []Log, filters Filters, extraArgs []stri
 	rc <- logs
 }
 
-func getFromGit(dir string, filters Filters, extraArgs []string) (logs []Log) {
+func getFromGit(project, dir string, filters Filters, extraArgs []string) (logs []Log) {
 	builtArgs := []string{"log", "--date=format:%Y-%m-%d %H:%M:%S", commitFormat}
 	builtArgs = append(builtArgs, extraArgs...)
 
@@ -74,13 +74,21 @@ func getFromGit(dir string, filters Filters, extraArgs []string) (logs []Log) {
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println("err")
+		return
 	}
 
-	wrappedOut := "[" + string(out) + "]"
+	output := string(out)
+	output = trailingComma.ReplaceAllString(output, "")
+	wrappedOut := "[" + output + "]"
 
 	err = json.Unmarshal([]byte(wrappedOut), &logs)
+
+	for i, _ := range logs {
+		logs[i].Project = project
+	}
+
 	if err != nil {
+		fmt.Println("git parse error", err)
 		return
 	}
 

@@ -1,5 +1,7 @@
 package aggregator
 
+import "regexp"
+
 var commitFormat = `--pretty=format:{
 	"hash": "%h",
 	"date": "%ad",
@@ -8,4 +10,6 @@ var commitFormat = `--pretty=format:{
 		"name": "%aN",
 		"email": "%aE"
 	}
-}`
+},`
+
+var trailingComma = regexp.MustCompile(",$")
