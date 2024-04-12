@@ -6,32 +6,40 @@ import (
 	"os"
 	"os/exec"
 	"sort"
+	"sync"
 	"time"
+
+	"github.com/panjf2000/ants/v2"
 )
 
 func GetLogs(sources []Source, filters Filters, extraArgs []string) (logs []Log) {
 	rc := make(chan []Log)
-	threads := 0
-
-	for _, source := range sources {
-		fmt.Println("Source", source)
-
-		threads++
-		go indexFolder(source, rc, filters, extraArgs)
-	}
+	var wg sync.WaitGroup
 
 	// Parallelize folders scanning
-	for {
-		logsPart := <-rc
+	go func() {
+		for {
+			logsPart, more := <-rc
 
-		logs = append(logs, logsPart...)
+			if !more {
+				return
+			}
 
-		threads--
-
-		if threads == 0 {
-			break
+			logs = append(logs, logsPart...)
 		}
+	}()
+
+	for _, source := range sources {
+		indexFolder(source, rc, &wg, filters, extraArgs)
 	}
+
+	defer ants.Release()
+
+	wg.Wait()
+	close(rc)
+
+	// Wait for chan to close
+	time.Sleep(1 * time.Millisecond)
 
 	sort.SliceStable(logs, func(i, j int) bool {
 		prevTime, _ := time.Parse("2006-01-02 15:04:05", logs[i].Date)
@@ -43,30 +51,34 @@ func GetLogs(sources []Source, filters Filters, extraArgs []string) (logs []Log)
 	return
 }
 
-func indexFolder(source Source, rc chan []Log, filters Filters, extraArgs []string) {
+func indexFolder(source Source, rc chan []Log, wg *sync.WaitGroup, filters Filters, extraArgs []string) {
 	projects, err := os.ReadDir(source.Path)
 	if err != nil {
 		rc <- []Log{}
 		return
 	}
 
-	var logs []Log
-
 	for _, project := range projects {
 		path := source.Path + "/" + project.Name()
 		_, err := os.Stat(path + "/.git")
 
 		if project.IsDir() && !os.IsNotExist(err) {
-			projectLogs := getFromGit(project.Name(), path, filters, extraArgs)
-			logs = append(logs, projectLogs...)
+			wg.Add(1)
+
+			ants.Submit(func() {
+				projectLogs := getFromGit(project.Name(), path, filters, extraArgs)
+
+				rc <- projectLogs
+
+				wg.Done()
+			})
 		}
 	}
 
-	rc <- logs
 }
 
 func getFromGit(project, dir string, filters Filters, extraArgs []string) (logs []Log) {
-	builtArgs := []string{"log", "--date=format:%Y-%m-%d %H:%M:%S", commitFormat}
+	builtArgs := []string{"log", "--all", "--date=format:%Y-%m-%d %H:%M:%S", commitFormat}
 	builtArgs = append(builtArgs, extraArgs...)
 
 	cmd := exec.Command("git", builtArgs...)
@@ -83,9 +95,16 @@ func getFromGit(project, dir string, filters Filters, extraArgs []string) (logs 
 
 	err = json.Unmarshal([]byte(wrappedOut), &logs)
 
-	for i, _ := range logs {
-		logs[i].Project = project
+	i := 0 // output index
+	for _, log := range logs {
+		if !filter(filters, log) {
+			continue
+		}
+		logs[i] = log
+		i++
 	}
+
+	logs = logs[:i]
 
 	if err != nil {
 		fmt.Println("git parse error", err)
