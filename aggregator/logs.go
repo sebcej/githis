@@ -26,7 +26,7 @@ func getLogsFromGit(project, dir string, config Config, extraArgs []string) (log
 
 	i := 0 // output index
 	for _, log := range logs {
-		if !filter(config, log) {
+		if !filter(config.Filters, log) {
 			continue
 		}
 

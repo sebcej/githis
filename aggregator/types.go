@@ -8,13 +8,14 @@ type Config struct {
 	Filters     Filters
 	FullMessage bool // True if commit message needs to be full
 	Raw         bool // Show RAW json git output
+}
 
+type Filters struct {
 	Offset  int // Days of offset, defaults to 0 (today)
 	FromDay string
 	ToDay   string
+	Limit   int
 }
-
-type Filters struct{}
 
 type CommitAuthor struct {
 	Name  string `json:"name"`

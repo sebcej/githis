@@ -1,12 +1,13 @@
 package aggregator
 
 import (
+	"fmt"
 	"os"
 	"sort"
 	"sync"
-	"time"
 
 	"github.com/panjf2000/ants/v2"
+	"github.com/sebcej/githis/utils"
 )
 
 func GetLogs(sources []Source, config Config, extraArgs []string) (logs []Log) {
@@ -36,12 +37,18 @@ func GetLogs(sources []Source, config Config, extraArgs []string) (logs []Log) {
 	wg.Wait()
 	close(rc)
 
+	fmt.Println("Total logs: ", len(logs), "\n")
+
 	sort.SliceStable(logs, func(i, j int) bool {
-		prevTime, _ := time.Parse("2006-01-02 15:04:05", logs[i].Date)
-		nextTime, _ := time.Parse("2006-01-02 15:04:05", logs[j].Date)
+		prevTime, _ := utils.ParseDate(logs[i].Date)
+		nextTime, _ := utils.ParseDate(logs[j].Date)
 
 		return prevTime.After(nextTime)
 	})
+
+	if len(logs) > config.Filters.Limit {
+		logs = logs[:config.Filters.Limit]
+	}
 
 	return
 }
