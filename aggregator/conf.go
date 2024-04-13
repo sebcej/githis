@@ -13,3 +13,5 @@ var commitFormat = `--pretty=format:{
 },`
 
 var trailingComma = regexp.MustCompile(",$")
+
+var MAX_COMMIT_LEN = 75

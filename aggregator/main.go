@@ -1,10 +1,7 @@
 package aggregator
 
 import (
-	"encoding/json"
-	"fmt"
 	"os"
-	"os/exec"
 	"sort"
 	"sync"
 	"time"
@@ -12,7 +9,7 @@ import (
 	"github.com/panjf2000/ants/v2"
 )
 
-func GetLogs(sources []Source, filters Filters, extraArgs []string) (logs []Log) {
+func GetLogs(sources []Source, config Config, extraArgs []string) (logs []Log) {
 	rc := make(chan []Log)
 	var wg sync.WaitGroup
 
@@ -26,11 +23,12 @@ func GetLogs(sources []Source, filters Filters, extraArgs []string) (logs []Log)
 			}
 
 			logs = append(logs, logsPart...)
+			wg.Done()
 		}
 	}()
 
 	for _, source := range sources {
-		indexFolder(source, rc, &wg, filters, extraArgs)
+		indexFolder(source, rc, &wg, config, extraArgs)
 	}
 
 	defer ants.Release()
@@ -38,20 +36,17 @@ func GetLogs(sources []Source, filters Filters, extraArgs []string) (logs []Log)
 	wg.Wait()
 	close(rc)
 
-	// Wait for chan to close
-	time.Sleep(1 * time.Millisecond)
-
 	sort.SliceStable(logs, func(i, j int) bool {
 		prevTime, _ := time.Parse("2006-01-02 15:04:05", logs[i].Date)
 		nextTime, _ := time.Parse("2006-01-02 15:04:05", logs[j].Date)
 
-		return prevTime.Before(nextTime)
+		return prevTime.After(nextTime)
 	})
 
 	return
 }
 
-func indexFolder(source Source, rc chan []Log, wg *sync.WaitGroup, filters Filters, extraArgs []string) {
+func indexFolder(source Source, rc chan []Log, wg *sync.WaitGroup, config Config, extraArgs []string) {
 	projects, err := os.ReadDir(source.Path)
 	if err != nil {
 		rc <- []Log{}
@@ -66,50 +61,11 @@ func indexFolder(source Source, rc chan []Log, wg *sync.WaitGroup, filters Filte
 			wg.Add(1)
 
 			ants.Submit(func() {
-				projectLogs := getFromGit(project.Name(), path, filters, extraArgs)
+				projectLogs := getLogsFromGit(project.Name(), path, config, extraArgs)
 
 				rc <- projectLogs
-
-				wg.Done()
 			})
 		}
 	}
 
-}
-
-func getFromGit(project, dir string, filters Filters, extraArgs []string) (logs []Log) {
-	builtArgs := []string{"log", "--all", "--date=format:%Y-%m-%d %H:%M:%S", commitFormat}
-	builtArgs = append(builtArgs, extraArgs...)
-
-	cmd := exec.Command("git", builtArgs...)
-	cmd.Dir = dir
-
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return
-	}
-
-	output := string(out)
-	output = trailingComma.ReplaceAllString(output, "")
-	wrappedOut := "[" + output + "]"
-
-	err = json.Unmarshal([]byte(wrappedOut), &logs)
-
-	i := 0 // output index
-	for _, log := range logs {
-		if !filter(filters, log) {
-			continue
-		}
-		logs[i] = log
-		i++
-	}
-
-	logs = logs[:i]
-
-	if err != nil {
-		fmt.Println("git parse error", err)
-		return
-	}
-
-	return
 }

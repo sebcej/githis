@@ -1,5 +1,5 @@
 package aggregator
 
-func filter(filters Filters, log Log) bool {
+func filter(config Config, log Log) bool {
 	return true
 }

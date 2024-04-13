@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/fatih/color"
@@ -10,11 +11,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
-	day     string
-	fromDay string
-	toDay   string
-)
+var config = aggregator.Config{}
 
 var logsCmd = &cobra.Command{
 	Use:   "logs",
@@ -24,10 +21,17 @@ var logsCmd = &cobra.Command{
 
 		viper.UnmarshalKey("sources", &sources)
 
-		filters := aggregator.Filters{}
-		logs := aggregator.GetLogs(sources, filters, args)
+		config.Filters = aggregator.Filters{}
+		logs := aggregator.GetLogs(sources, config, args)
 
 		fmt.Println("Total logs: ", len(logs), "\n")
+
+		if config.Raw {
+			json, _ := json.MarshalIndent(logs, "", "    ")
+
+			fmt.Println(string(json))
+			return
+		}
 
 		makeTable(logs)
 	},
@@ -46,8 +50,9 @@ func makeTable(logs []aggregator.Log) {
 }
 
 func init() {
-	logsCmd.PersistentFlags().StringVar(&day, "day", "", "Filter by day")
-
-	logsCmd.PersistentFlags().StringVar(&fromDay, "fromDay", "", "Filter start date")
-	logsCmd.PersistentFlags().StringVar(&toDay, "toDay", "", "Filter end date")
+	logsCmd.PersistentFlags().IntVar(&config.Offset, "offset", 0, "Set positive or negative offset based on today")
+	logsCmd.PersistentFlags().BoolVar(&config.FullMessage, "fullMessage", false, "Show full commit messages")
+	logsCmd.PersistentFlags().BoolVar(&config.Raw, "raw", false, "Show RAW json git output")
+	logsCmd.PersistentFlags().StringVar(&config.FromDay, "fromDay", "", "Start date for commit filter")
+	logsCmd.PersistentFlags().StringVar(&config.ToDay, "toDay", "", "End date for commit filter")
 }
