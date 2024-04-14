@@ -4,11 +4,12 @@ import (
 	"time"
 
 	"github.com/sebcej/githis/utils"
+	"github.com/spf13/cobra"
 )
 
 func filter(filters Filters, log Log) bool {
 	cur := time.Now()
-	logDate, _ := utils.ParseDate(log.Date)
+	logDate, _ := utils.ParseLogDate(log.Date)
 
 	if filters.Offset != 0 {
 		cur = cur.AddDate(0, 0, filters.Offset)
@@ -32,6 +33,23 @@ func filter(filters Filters, log Log) bool {
 		}
 
 		if !present {
+			return false
+		}
+	}
+
+	if filters.FromDay != "" {
+		date, _ := utils.ParseLogDate(log.Date)
+
+		from, err := utils.ParseDate(filters.FromDay)
+		cobra.CheckErr(err)
+		to := time.Now()
+
+		if filters.ToDay != "" {
+			to, err = utils.ParseDate(filters.ToDay)
+			cobra.CheckErr(err)
+		}
+
+		if !date.After(from) || !date.Before(to) {
 			return false
 		}
 	}

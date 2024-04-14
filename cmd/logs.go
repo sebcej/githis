@@ -20,6 +20,16 @@ var logsCmd = &cobra.Command{
 
 		viper.UnmarshalKey("sources", &sources)
 
+		// Set author default if available
+		if len(config.Filters.Authors) == 0 {
+			authorFilter := viper.GetString("author")
+
+			if authorFilter != "" {
+				fmt.Println("By author: ", authorFilter)
+				config.Filters.Authors = []string{authorFilter}
+			}
+		}
+
 		logs := aggregator.GetLogs(sources, config, args)
 
 		if config.Raw {

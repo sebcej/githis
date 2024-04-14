@@ -40,8 +40,8 @@ func GetLogs(sources []Source, config Config, extraArgs []string) (logs []Log) {
 	fmt.Println("Total logs: ", len(logs), "\n")
 
 	sort.SliceStable(logs, func(i, j int) bool {
-		prevTime, _ := utils.ParseDate(logs[i].Date)
-		nextTime, _ := utils.ParseDate(logs[j].Date)
+		prevTime, _ := utils.ParseLogDate(logs[i].Date)
+		nextTime, _ := utils.ParseLogDate(logs[j].Date)
 
 		return prevTime.After(nextTime)
 	})
