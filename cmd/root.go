@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	cfg "github.com/sebcej/githis/cmd/config"
 	"github.com/sebcej/githis/cmd/source"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -38,6 +39,7 @@ func init() {
 
 	rootCmd.AddCommand(logsCmd)
 	rootCmd.AddCommand(source.SourceCmd)
+	rootCmd.AddCommand(cfg.ConfigCmd)
 }
 
 func initConfig() {

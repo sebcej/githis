@@ -11,7 +11,8 @@ type Config struct {
 }
 
 type Filters struct {
-	Offset  int // Days of offset, defaults to 0 (today)
+	Offset  int      // Days of offset, defaults to 0 (today)
+	Authors []string // Authors of commit
 	FromDay string
 	ToDay   string
 	Limit   int

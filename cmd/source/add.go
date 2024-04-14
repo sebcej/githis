@@ -29,7 +29,7 @@ var addCmd = &cobra.Command{
 
 		viper.UnmarshalKey("sources", &sources)
 
-		if slices.IndexFunc[[]aggregator.Source](sources, func(s aggregator.Source) bool { return s.Name == newSource.Name }) != -1 {
+		if slices.IndexFunc(sources, func(s aggregator.Source) bool { return s.Name == newSource.Name }) != -1 {
 			cobra.CheckErr(errors.New("name already used"))
 			return
 		}

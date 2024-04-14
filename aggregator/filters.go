@@ -16,7 +16,24 @@ func filter(filters Filters, log Log) bool {
 		y1, m1, d1 := logDate.Date()
 		y2, m2, d2 := cur.Date()
 
-		return y1 == y2 && m1 == m2 && d1 == d2
+		if y1 != y2 || m1 != m2 || d1 != d2 {
+			return false
+		}
+	}
+
+	if len(filters.Authors) > 0 {
+		present := false
+
+		for _, author := range filters.Authors {
+			if author == log.Author.Name || author == log.Author.Email {
+				present = true
+				break
+			}
+		}
+
+		if !present {
+			return false
+		}
 	}
 
 	return true

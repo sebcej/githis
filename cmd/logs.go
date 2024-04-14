@@ -37,6 +37,7 @@ func init() {
 	logsCmd.PersistentFlags().BoolVar(&config.FullMessage, "fullMessage", false, "Show full commit messages")
 	logsCmd.PersistentFlags().BoolVar(&config.Raw, "raw", false, "Show RAW json git output")
 
+	logsCmd.PersistentFlags().StringSliceVarP(&config.Filters.Authors, "author", "a", []string{}, "Filter by commit author")
 	logsCmd.PersistentFlags().IntVarP(&config.Filters.Limit, "limit", "l", 100, "Limit number of show commits")
 	logsCmd.PersistentFlags().IntVarP(&config.Filters.Offset, "offset", "o", 0, "Set positive or negative offset based on today")
 	logsCmd.PersistentFlags().StringVar(&config.Filters.FromDay, "fromDay", "", "Start date for commit filter")
