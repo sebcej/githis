@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
+	"strings"
 )
 
 func getLogsFromGit(project, dir string, config Config, extraArgs []string) (logs []Log) {
@@ -20,6 +21,8 @@ func getLogsFromGit(project, dir string, config Config, extraArgs []string) (log
 
 	output := string(out)
 	output = trailingComma.ReplaceAllString(output, "")
+	output = strings.ReplaceAll(output, `"`, `\"`)
+	output = strings.ReplaceAll(output, "^|^", `"`)
 	wrappedOut := "[" + output + "]"
 
 	err = json.Unmarshal([]byte(wrappedOut), &logs)
