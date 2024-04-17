@@ -21,11 +21,17 @@ func getLogsFromGit(project, dir string, config Config, extraArgs []string) (log
 
 	output := string(out)
 	output = trailingComma.ReplaceAllString(output, "")
+	output = strings.ReplaceAll(output, `\`, `\\`)
 	output = strings.ReplaceAll(output, `"`, `\"`)
 	output = strings.ReplaceAll(output, "^|^", `"`)
 	wrappedOut := "[" + output + "]"
 
 	err = json.Unmarshal([]byte(wrappedOut), &logs)
+
+	if err != nil {
+		fmt.Println("Cannot parse project", project, ":", err)
+		return
+	}
 
 	i := 0 // output index
 	for _, log := range logs {
@@ -46,11 +52,6 @@ func getLogsFromGit(project, dir string, config Config, extraArgs []string) (log
 	}
 
 	logs = logs[:i]
-
-	if err != nil {
-		fmt.Println("git parse error", err)
-		return
-	}
 
 	return
 }
