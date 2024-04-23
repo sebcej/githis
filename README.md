@@ -2,13 +2,15 @@
 
 Simple commits aggregator for your projects folder
 
+With this cli you can track all contributions from one or multiple developers in all company projects at once.
+
 ## Functionalities
 
 * Get all your projects commits in a single place
 * Filter by date, author or list of authors
 * Support for multiple projects folders
 
-## Example
+## Examples
 
 Set your projects folder
 
@@ -29,3 +31,5 @@ See your yesterday commits in all your local projects
 Filter by group of authors
 
 `githis logs -a sebcej -a anotherdev`
+
+Use `githis help` to see all functionalities
