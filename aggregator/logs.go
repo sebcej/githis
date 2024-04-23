@@ -8,7 +8,7 @@ import (
 )
 
 func getLogsFromGit(project, dir string, config Config, extraArgs []string) (logs []Log) {
-	builtArgs := []string{"log", "--all", "--date=format:%Y-%m-%d %H:%M:%S", commitFormat}
+	builtArgs := []string{"log", "--all", "--decorate", "--date=format:%Y-%m-%d %H:%M:%S", commitFormat}
 	builtArgs = append(builtArgs, extraArgs...)
 
 	if config.Pull {

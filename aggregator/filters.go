@@ -37,16 +37,23 @@ func filter(filters Filters, log Log) bool {
 		}
 	}
 
-	if filters.FromDay != "" {
+	if filters.Day != "" {
+		filters.From = filters.Day
+		filters.To = filters.Day
+	}
+
+	if filters.From != "" {
 		date, _ := utils.ParseLogDate(log.Date)
 
-		from, err := utils.ParseDate(filters.FromDay)
+		from, err := utils.ParseDate(filters.From)
 		cobra.CheckErr(err)
 		to := time.Now()
 
-		if filters.ToDay != "" {
-			to, err = utils.ParseDate(filters.ToDay)
+		if filters.To != "" {
+			to, err = utils.ParseDate(filters.To)
 			cobra.CheckErr(err)
+
+			to = to.AddDate(0, 0, 1)
 		}
 
 		if !date.After(from) || !date.Before(to) {

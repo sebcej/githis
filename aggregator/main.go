@@ -37,11 +37,15 @@ func GetLogs(sources []Source, config Config, extraArgs []string) (logs []Log) {
 	wg.Wait()
 	close(rc)
 
-	fmt.Println("Total logs: ", len(logs), "\n")
+	fmt.Print("Total logs: ", len(logs), "\n\n")
 
 	sort.SliceStable(logs, func(i, j int) bool {
 		prevTime, _ := utils.ParseLogDate(logs[i].Date)
 		nextTime, _ := utils.ParseLogDate(logs[j].Date)
+
+		if config.Reverse {
+			return prevTime.Before(nextTime)
+		}
 
 		return prevTime.After(nextTime)
 	})

@@ -6,6 +6,7 @@ import "regexp"
 var commitFormat = `--pretty=format:{
 	^|^hash^|^: ^|^%h^|^,
 	^|^date^|^: ^|^%ad^|^,
+	^|^branch^|^: ^|^%D^|^,
 	^|^subject^|^: ^|^%s^|^,
 	^|^author^|^: {
 		^|^name^|^: ^|^%aN^|^,

@@ -1,14 +1,22 @@
 # githis
 
-Simple commits aggregator for your projects folder
+Simple commits aggregator for your projects folders
 
-With this cli you can track all contributions from one or multiple developers in all company projects at once.
-
-## Functionalities
+## Why
 
 * Get all your projects commits in a single place
-* Filter by date, author or list of authors
+* Filter all projects by date, author or list of authors
 * Support for multiple projects folders
+
+## Installation
+
+### Mac
+
+```bash
+xattr -d com.apple.quarantine githis
+chmod +x githis
+sudo mv githis /usr/local/bin
+```
 
 ## Examples
 
@@ -27,6 +35,10 @@ See your yesterday commits in all your local projects
 ... or filter by date range
 
 `githis logs --fromDate 2024-04-10 --toDate 2024-04-13`
+
+... or filter by single day
+
+`githis logs -d 2024-04-10`
 
 Filter by group of authors
 

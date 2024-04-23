@@ -9,13 +9,15 @@ type Config struct {
 	FullMessage bool // True if commit message needs to be full
 	Raw         bool // Show RAW json git output
 	Pull        bool // Pull automatically before parsing logs
+	Reverse     bool // Reverse the order of logs
 }
 
 type Filters struct {
 	Offset  int      // Days of offset, defaults to 0 (today)
 	Authors []string // Authors of commit
-	FromDay string
-	ToDay   string
+	From    string
+	To      string
+	Day     string // Automatically set from and to to the selected day
 	Limit   int
 }
 
@@ -29,6 +31,7 @@ type Log struct {
 	Hash    string       `json:"hash"`
 	Author  CommitAuthor `json:"author"`
 	Message string       `json:"subject"`
+	Branch  string       `json:"branch"`
 
 	Project   string
 	CommitUrl string

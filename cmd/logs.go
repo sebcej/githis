@@ -47,10 +47,12 @@ func init() {
 	logsCmd.PersistentFlags().BoolVar(&config.FullMessage, "fullMessage", false, "Show full commit messages")
 	logsCmd.PersistentFlags().BoolVar(&config.Raw, "raw", false, "Show RAW json git output")
 	logsCmd.PersistentFlags().BoolVarP(&config.Pull, "pull", "p", false, "Pull the repo before")
+	logsCmd.PersistentFlags().BoolVarP(&config.Reverse, "reverse", "r", false, "Reverse the order of logs (from older to newer)")
 
 	logsCmd.PersistentFlags().StringSliceVarP(&config.Filters.Authors, "author", "a", []string{}, "Filter by commit author")
 	logsCmd.PersistentFlags().IntVarP(&config.Filters.Limit, "limit", "l", 100, "Limit number of show commits")
 	logsCmd.PersistentFlags().IntVarP(&config.Filters.Offset, "offset", "o", 0, "Set positive or negative offset based on today")
-	logsCmd.PersistentFlags().StringVar(&config.Filters.FromDay, "fromDay", "", "Start date for commit filter")
-	logsCmd.PersistentFlags().StringVar(&config.Filters.ToDay, "toDay", "", "End date for commit filter")
+	logsCmd.PersistentFlags().StringVarP(&config.Filters.Day, "day", "d", "", "Filter by single day")
+	logsCmd.PersistentFlags().StringVar(&config.Filters.From, "from", "", "Start date for commit filter")
+	logsCmd.PersistentFlags().StringVar(&config.Filters.To, "to", "", "End date for commit filter")
 }

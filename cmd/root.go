@@ -16,7 +16,7 @@ var rootCmd = &cobra.Command{
 	Use:   "githis",
 	Short: "Aggregate all your project commits",
 	Long: `GitHis is a CLI that allows to aggregate and manage all your projects commits in one place.
-Start by adding a Projects folder with githis source add [source_folder]`,
+Start by adding a Projects folder with "githis source add [folder_name] [folder_path]"`,
 }
 
 func Execute() {
