@@ -33,8 +33,8 @@ type Log struct {
 	Message string       `json:"subject"`
 	Branch  string       `json:"branch"`
 
-	Project   string
-	CommitUrl string
+	Project   string `json:"project"`
+	CommitUrl string `json:"commitUrl"`
 }
 
 type commitBase string
