@@ -16,6 +16,7 @@ var commitFormat = `--pretty=format:{
 var trailingComma = regexp.MustCompile(",$")
 var matchRepoEnd = regexp.MustCompile(".git$")
 
-var matchGitRepoStart = regexp.MustCompile("^.+github.com(:|/)")
+var matchGithubRepoStart = regexp.MustCompile("^.+github.com(:|/)")
+var matchGitlabRepoStart = regexp.MustCompile("^.+gitlab.com(:|/)")
 
 var MAX_COMMIT_LEN = 75

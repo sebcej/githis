@@ -85,9 +85,18 @@ func (typeUrl commitBase) getCommitUrl(commit string) string {
 
 	if strings.Contains(url, "github.com") {
 		url = matchRepoEnd.ReplaceAllString(url, "")
-		url = matchGitRepoStart.ReplaceAllString(url, "")
+		url = matchGithubRepoStart.ReplaceAllString(url, "")
 
 		url = "https://github.com/" + url + "/commit/" + commit
+
+		return url
+	}
+
+	if strings.Contains(url, "gitlab.com") {
+		url = matchRepoEnd.ReplaceAllString(url, "")
+		url = matchGitlabRepoStart.ReplaceAllString(url, "")
+
+		url = "https://gitlab.com/" + url + "/-/commit/" + commit
 
 		return url
 	}
