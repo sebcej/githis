@@ -46,6 +46,7 @@ var logsCmd = &cobra.Command{
 func init() {
 	logsCmd.PersistentFlags().BoolVar(&config.FullMessage, "fullMessage", false, "Show full commit messages")
 	logsCmd.PersistentFlags().BoolVar(&config.Raw, "raw", false, "Show RAW json git output")
+	logsCmd.PersistentFlags().BoolVarP(&config.Pull, "pull", "p", false, "Pull the repo before")
 
 	logsCmd.PersistentFlags().StringSliceVarP(&config.Filters.Authors, "author", "a", []string{}, "Filter by commit author")
 	logsCmd.PersistentFlags().IntVarP(&config.Filters.Limit, "limit", "l", 100, "Limit number of show commits")

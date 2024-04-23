@@ -11,6 +11,16 @@ func getLogsFromGit(project, dir string, config Config, extraArgs []string) (log
 	builtArgs := []string{"log", "--all", "--date=format:%Y-%m-%d %H:%M:%S", commitFormat}
 	builtArgs = append(builtArgs, extraArgs...)
 
+	if config.Pull {
+		pullCmd := exec.Command("git", "pull", "--quiet")
+		pullCmd.Dir = dir
+
+		_, err := pullCmd.CombinedOutput()
+		if err != nil {
+			return
+		}
+	}
+
 	cmd := exec.Command("git", builtArgs...)
 	cmd.Dir = dir
 

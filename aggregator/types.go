@@ -8,6 +8,7 @@ type Config struct {
 	Filters     Filters
 	FullMessage bool // True if commit message needs to be full
 	Raw         bool // Show RAW json git output
+	Pull        bool // Pull automatically before parsing logs
 }
 
 type Filters struct {
