@@ -29,5 +29,9 @@ type Log struct {
 	Hash    string       `json:"hash"`
 	Author  CommitAuthor `json:"author"`
 	Message string       `json:"subject"`
-	Project string
+
+	Project   string
+	CommitUrl string
 }
+
+type commitBase string

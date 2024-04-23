@@ -21,13 +21,15 @@ func getLogsFromGit(project, dir string, config Config, extraArgs []string) (log
 		}
 	}
 
-	cmd := exec.Command("git", builtArgs...)
-	cmd.Dir = dir
+	cmdLogs := exec.Command("git", builtArgs...)
+	cmdLogs.Dir = dir
 
-	out, err := cmd.CombinedOutput()
+	out, err := cmdLogs.CombinedOutput()
 	if err != nil {
 		return
 	}
+
+	urlBase := getUrlFromProject(dir)
 
 	output := string(out)
 	output = trailingComma.ReplaceAllString(output, "")
@@ -51,6 +53,7 @@ func getLogsFromGit(project, dir string, config Config, extraArgs []string) (log
 
 		logs[i] = log
 		logs[i].Project = project
+		logs[i].CommitUrl = urlBase.getCommitUrl(log.Hash)
 
 		msg := log.Message
 
@@ -64,4 +67,49 @@ func getLogsFromGit(project, dir string, config Config, extraArgs []string) (log
 	logs = logs[:i]
 
 	return
+}
+
+func getUrlFromProject(dir string) commitBase {
+	cmdGetRemotes := exec.Command("git", "ls-remote", "--get-url")
+	cmdGetRemotes.Dir = dir
+
+	rawUrls, err := cmdGetRemotes.CombinedOutput()
+	if err != nil {
+		return ""
+	}
+
+	strUrls := string(rawUrls)
+	urls := strings.Split(strUrls, "\n")
+
+	if len(urls) == 0 {
+		return ""
+	}
+
+	url := urls[0]
+
+	return commitBase(url)
+}
+
+func (typeUrl commitBase) getCommitUrl(commit string) string {
+	url := string(typeUrl)
+
+	if strings.Contains(url, "github.com") {
+		url = matchRepoEnd.ReplaceAllString(url, "")
+		url = matchGithubRepoStart.ReplaceAllString(url, "")
+
+		url = "https://github.com/" + url + "/commit/" + commit
+
+		return url
+	}
+
+	if strings.Contains(url, "gitlab.com") {
+		url = matchRepoEnd.ReplaceAllString(url, "")
+		url = matchGitlabRepoStart.ReplaceAllString(url, "")
+
+		url = "https://gitlab.com/" + url + "/-/commit/" + commit
+
+		return url
+	}
+
+	return ""
 }
