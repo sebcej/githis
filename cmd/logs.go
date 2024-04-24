@@ -3,7 +3,9 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/sebcej/githis/aggregator"
 	"github.com/sebcej/githis/out"
 	"github.com/spf13/cobra"
@@ -20,6 +22,11 @@ var logsCmd = &cobra.Command{
 
 		viper.UnmarshalKey("sources", &sources)
 
+		s := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
+		s.Prefix = "\n"
+		s.Suffix = "\n"
+		s.Color("green")
+
 		// Set author default if available
 		if len(config.Filters.Authors) == 0 {
 			authorFilter := viper.GetString("author")
@@ -30,6 +37,8 @@ var logsCmd = &cobra.Command{
 			}
 		}
 
+		s.Start()
+
 		logs := aggregator.GetLogs(sources, config, args)
 
 		if config.Raw {
@@ -38,6 +47,8 @@ var logsCmd = &cobra.Command{
 			fmt.Println(string(json))
 			return
 		}
+
+		s.Stop()
 
 		out.MakeStatic(logs)
 	},
