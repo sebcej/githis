@@ -39,7 +39,11 @@ var logsCmd = &cobra.Command{
 
 		s.Start()
 
-		logs := aggregator.GetLogs(sources, config, args)
+		logs, logsLen := aggregator.GetLogs(sources, config, args)
+
+		s.Stop()
+
+		fmt.Printf("Total logs: %d\n\n", logsLen)
 
 		if config.Raw {
 			json, _ := json.MarshalIndent(logs, "", "    ")
@@ -47,8 +51,6 @@ var logsCmd = &cobra.Command{
 			fmt.Println(string(json))
 			return
 		}
-
-		s.Stop()
 
 		out.MakeStatic(logs)
 	},

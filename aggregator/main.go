@@ -1,7 +1,6 @@
 package aggregator
 
 import (
-	"fmt"
 	"os"
 	"sort"
 	"sync"
@@ -10,7 +9,7 @@ import (
 	"github.com/sebcej/githis/utils"
 )
 
-func GetLogs(sources []Source, config Config, extraArgs []string) (logs []Log) {
+func GetLogs(sources []Source, config Config, extraArgs []string) (logs []Log, preFilterLogsLen int) {
 	rc := make(chan []Log)
 	var wg sync.WaitGroup
 
@@ -37,7 +36,7 @@ func GetLogs(sources []Source, config Config, extraArgs []string) (logs []Log) {
 	wg.Wait()
 	close(rc)
 
-	fmt.Print("Total logs: ", len(logs), "\n\n")
+	preFilterLogsLen = len(logs)
 
 	sort.SliceStable(logs, func(i, j int) bool {
 		prevTime, _ := utils.ParseLogDate(logs[i].Date)
