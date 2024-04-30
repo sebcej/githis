@@ -17,6 +17,9 @@ var commitFormat = `--pretty=format:{
 var trailingComma = regexp.MustCompile(",$")
 var matchRepoEnd = regexp.MustCompile(".git$")
 
+var matchDatePartialDay = regexp.MustCompile(`^\d\d$`)
+var matchDatePartialDayMonth = regexp.MustCompile(`^(\d\d)-(\d\d)$`)
+
 var matchGithubRepoStart = regexp.MustCompile("^.+github.com(:|/)")
 var matchGitlabRepoStart = regexp.MustCompile("^.+gitlab.com(:|/)")
 
